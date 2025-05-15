@@ -73,4 +73,15 @@ class PostRepositoryImpl : PostRepository {
             .execute()
             .close()
     }
+
+    override fun deleteLikeById(id: Long) {
+        val request: Request = Request.Builder()
+            .delete()
+            .url("${BASE_URL}/api/posts/{id}/likes")
+            .build()
+
+        client.newCall(request)
+            .execute()
+            .close()
+    }
 }

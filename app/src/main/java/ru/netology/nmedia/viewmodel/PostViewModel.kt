@@ -71,7 +71,21 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun likeById(id: Long) {
-        thread { repository.likeById(id) }
+        thread {
+            if ((_data.value?.posts.orEmpty().first { it.id == id }).likedByMe) {
+                try {
+                    repository.deleteLikeById(id)
+                } catch (e: IOException) {
+                    FeedModel(error(true))
+                }
+            }
+            try {
+                repository.likeById(id)
+            } catch (e: IOException) {
+                FeedModel(error(true))
+            }
+            _postCreated.postValue(Unit)
+        }
     }
 
     fun removeById(id: Long) {
@@ -79,8 +93,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             // Оптимистичная модель
             val old = _data.value?.posts.orEmpty()
             _data.postValue(
-                _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                    .filter { it.id != id }
+                _data.value?.copy(
+                    posts = _data.value?.posts.orEmpty()
+                        .filter { it.id != id }
                 )
             )
             try {
