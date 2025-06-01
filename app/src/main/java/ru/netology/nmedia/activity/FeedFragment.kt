@@ -59,6 +59,9 @@ class FeedFragment : Fragment() {
             binding.errorGroup.isVisible = state.error
             binding.emptyText.isVisible = state.empty
         }
+        viewModel.postCreated.observe(viewLifecycleOwner){
+
+        }
 
         binding.retryButton.setOnClickListener {
             viewModel.loadPosts()
