@@ -51,8 +51,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun save() {
         edited.value?.let {
             thread {
-                repository.save(it)
-                _postCreated.postValue(Unit)
+                val post = repository.save(it)
+                _postCreated.postValue(post)
             }
         }
         edited.value = empty
@@ -72,9 +72,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun likeById(id: Long) {
         thread {
+            val old = _data.value?.posts.orEmpty()
             if ((_data.value?.posts.orEmpty().first { it.id == id }).likedByMe) {
                 try {
                     repository.deleteLikeById(id)
+
                 } catch (e: IOException) {
                     FeedModel(error(true))
                 }
