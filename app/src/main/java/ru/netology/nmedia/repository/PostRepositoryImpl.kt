@@ -67,7 +67,7 @@ class PostRepositoryImpl : PostRepository {
     override fun removeById(id: Long): Post {
         val request: Request = Request.Builder()
             .delete()
-            .url("${BASE_URL}/api/slow/posts/$id")
+            .url("${BASE_URL}/api/posts/${id}/likes")
             .build()
 
         return client.newCall(request)
@@ -78,14 +78,17 @@ class PostRepositoryImpl : PostRepository {
             }
     }
 
-    override fun deleteLikeById(id: Long) {
+    override fun deleteLikeById(id: Long): Post {
         val request: Request = Request.Builder()
             .delete()
             .url("${BASE_URL}/api/posts/{id}/likes")
             .build()
 
-        client.newCall(request)
+        return client.newCall(request)
             .execute()
-            .close()
+            .let { it.body?.string() ?: throw RuntimeException("body is null") }
+            .let {
+                gson.fromJson(it, Post::class.java)
+            }
     }
 }

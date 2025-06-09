@@ -72,27 +72,29 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun likeById(id: Long) {
         thread {
-            val old = _data.value?.posts.orEmpty()
-            if ((_data.value?.posts.orEmpty().first { it.id == id }).likedByMe) {
-                try {
-                    repository.deleteLikeById(id)
-
-                } catch (e: IOException) {
-                    FeedModel(error(true))
-                }
-            }
             try {
-                repository.likeById(id)
+                lateinit var post: Post
+                // <--- Сохраняем результат if-else
+                if ((_data.value?.posts.orEmpty().first { it.id == id }).likedByMe) {
+                    post = repository.deleteLikeById(id)
+                } else { // <--- Добавили else
+                    post = repository.likeById(id)
+                }
+                _data.postValue( // <--- Обновляем LiveData
+                    _data.value?.copy(
+                        posts = _data.value?.posts.orEmpty()
+                            .map { if (it.id == post.id) post else it } // Обновляем пост в списке
+                    )
+                )
             } catch (e: IOException) {
-                FeedModel(error(true))
+                FeedModel(error = true) // Метод error выбрасывает ошибку, полагаю вы хотели именно в поле error FeedModel поместить значение true
             }
-            _postCreated.postValue(Unit)
+            //_postCreated.postValue(Unit) <--- Больше не нужно
         }
     }
 
     fun removeById(id: Long) {
         thread {
-            // Оптимистичная модель
             val old = _data.value?.posts.orEmpty()
             _data.postValue(
                 _data.value?.copy(
