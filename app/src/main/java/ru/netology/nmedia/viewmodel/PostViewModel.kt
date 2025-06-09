@@ -51,8 +51,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun save() {
         edited.value?.let {
             thread {
-                repository.save(it)
-                _postCreated.postValue(Unit)
+                val post = repository.save(it)
+                _postCreated.postValue(post)
             }
         }
         edited.value = empty
@@ -71,16 +71,35 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun likeById(id: Long) {
-        thread { repository.likeById(id) }
+        thread {
+            try {
+                lateinit var post: Post
+                // <--- Сохраняем результат if-else
+                if ((_data.value?.posts.orEmpty().first { it.id == id }).likedByMe) {
+                    post = repository.deleteLikeById(id)
+                } else { // <--- Добавили else
+                    post = repository.likeById(id)
+                }
+                _data.postValue( // <--- Обновляем LiveData
+                    _data.value?.copy(
+                        posts = _data.value?.posts.orEmpty()
+                            .map { if (it.id == post.id) post else it } // Обновляем пост в списке
+                    )
+                )
+            } catch (e: IOException) {
+                FeedModel(error = true) // Метод error выбрасывает ошибку, полагаю вы хотели именно в поле error FeedModel поместить значение true
+            }
+            //_postCreated.postValue(Unit) <--- Больше не нужно
+        }
     }
 
     fun removeById(id: Long) {
         thread {
-            // Оптимистичная модель
             val old = _data.value?.posts.orEmpty()
             _data.postValue(
-                _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                    .filter { it.id != id }
+                _data.value?.copy(
+                    posts = _data.value?.posts.orEmpty()
+                        .filter { it.id != id }
                 )
             )
             try {

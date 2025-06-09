@@ -34,6 +34,7 @@ class FeedFragment : Fragment() {
 
             override fun onLike(post: Post) {
                 viewModel.likeById(post.id)
+
             }
 
             override fun onRemove(post: Post) {
@@ -58,6 +59,10 @@ class FeedFragment : Fragment() {
             binding.progress.isVisible = state.loading
             binding.errorGroup.isVisible = state.error
             binding.emptyText.isVisible = state.empty
+        }
+
+        viewModel.postCreated.observe(viewLifecycleOwner) {
+            viewModel.loadPosts()
         }
 
         binding.retryButton.setOnClickListener {
