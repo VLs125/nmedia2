@@ -6,6 +6,7 @@ import java.lang.Exception
 interface PostRepository {
     fun getAll(): List<Post>
     fun getAllAsync(callback: Callback<List<Post>>)
+    fun getAllAsyncRetrofit(callback: Callback<List<Post>>)
     fun likeById(id: Long): Post
     fun likeByIdAsync(id: Long, callback: Callback<Post>)
 
@@ -15,6 +16,7 @@ interface PostRepository {
     fun removeByIdAsync(id: Long, callback: Callback<Unit>)
     fun deleteLikeById(id: Long): Post
     fun deleteLikeByIdAsync(id: Long, callback: Callback<Post>)
+
 
     interface Callback<T> {
         fun onSuccess(data: T)

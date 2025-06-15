@@ -10,10 +10,11 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.internal.EMPTY_REQUEST
+import ru.netology.nmedia.api.PostsApi
 import ru.netology.nmedia.dto.Post
 import java.io.IOException
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
+import kotlin.Exception
 
 
 class PostRepositoryImpl : PostRepository {
@@ -60,6 +61,26 @@ class PostRepositoryImpl : PostRepository {
                     }
                 }
             })
+    }
+
+    override fun getAllAsyncRetrofit(callback: PostRepository.Callback<List<Post>>) {
+        PostsApi.service.getAll().enqueue(object : retrofit2.Callback<List<Post>> {
+            override fun onResponse(
+                call: retrofit2.Call<List<Post>>,
+                response: retrofit2.Response<List<Post>>
+            ) {
+                if (response.isSuccessful) {
+                    callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
+                } else {
+                    callback.onError(RuntimeException(response.message()))
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<List<Post>>, t: Throwable) {
+                callback.onError(RuntimeException("Не удалось , попробуйте снова"))
+            }
+
+        })
     }
 
 
