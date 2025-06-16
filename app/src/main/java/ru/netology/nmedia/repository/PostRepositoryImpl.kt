@@ -72,7 +72,7 @@ class PostRepositoryImpl : PostRepository {
                 if (response.isSuccessful) {
                     callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
                 } else {
-                    callback.onError(RuntimeException(response.message()))
+                    callback.onError(RuntimeException(response.code().toString()))
                 }
             }
 
@@ -125,6 +125,26 @@ class PostRepositoryImpl : PostRepository {
             })
     }
 
+    override fun likeByIdRetrofit(id: Long, callback: PostRepository.Callback<Post>) {
+        PostsApi.service.likeById(id).enqueue(object : retrofit2.Callback<Post> {
+            override fun onResponse(
+                call: retrofit2.Call<Post>,
+                response: retrofit2.Response<Post>
+            ) {
+                if (response.isSuccessful) {
+                    callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
+                } else {
+                    callback.onError(RuntimeException(response.code().toString()))
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<Post>, t: Throwable) {
+                callback.onError(RuntimeException("Не удалось , попробуйте снова"))
+            }
+
+        })
+    }
+
     override fun save(post: Post) {
         val request: Request = Request.Builder()
             .post(gson.toJson(post).toRequestBody(jsonType))
@@ -156,6 +176,24 @@ class PostRepositoryImpl : PostRepository {
                     }
                 }
             })
+    }
+
+    override fun saveRetrofit(post: Post, callback: PostRepository.Callback<Unit>) {
+        PostsApi.service.save(post).enqueue(object : retrofit2.Callback<Unit> {
+            override fun onResponse(
+                call: retrofit2.Call<Unit>,
+                response: retrofit2.Response<Unit>
+            ) {
+                if (!response.isSuccessful) {
+                    callback.onError(RuntimeException(response.code().toString()))
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<Unit>, t: Throwable) {
+                callback.onError(RuntimeException("Не удалось , попробуйте снова"))
+            }
+
+        })
     }
 
     override fun removeById(id: Long) {
@@ -191,6 +229,24 @@ class PostRepositoryImpl : PostRepository {
 
     }
 
+    override fun removeByIdRetrofit(id: Long, callback: PostRepository.Callback<Unit>) {
+        PostsApi.service.removeById(id).enqueue(object : retrofit2.Callback<Unit> {
+            override fun onResponse(
+                call: retrofit2.Call<Unit>,
+                response: retrofit2.Response<Unit>
+            ) {
+                if (!response.isSuccessful) {
+                    callback.onError(RuntimeException(response.code().toString()))
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<Unit>, t: Throwable) {
+                callback.onError(RuntimeException("Не удалось , попробуйте снова"))
+            }
+
+        })
+    }
+
     override fun deleteLikeById(id: Long): Post {
         val request: Request = Request.Builder()
             .delete()
@@ -224,5 +280,25 @@ class PostRepositoryImpl : PostRepository {
                     }
                 }
             })
+    }
+
+    override fun deleteLikeByIdRetrofit(id: Long, callback: PostRepository.Callback<Post>) {
+        PostsApi.service.deleteLikeById(id).enqueue(object : retrofit2.Callback<Post> {
+            override fun onResponse(
+                call: retrofit2.Call<Post>,
+                response: retrofit2.Response<Post>
+            ) {
+                if (response.isSuccessful) {
+                    callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
+                } else {
+                    callback.onError(RuntimeException(response.code().toString()))
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<Post>, t: Throwable) {
+                callback.onError(RuntimeException("Не удалось , попробуйте снова"))
+            }
+
+        })
     }
 }

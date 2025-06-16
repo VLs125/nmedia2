@@ -9,13 +9,17 @@ interface PostRepository {
     fun getAllAsyncRetrofit(callback: Callback<List<Post>>)
     fun likeById(id: Long): Post
     fun likeByIdAsync(id: Long, callback: Callback<Post>)
+    fun likeByIdRetrofit(id: Long, callback: Callback<Post>)
 
     fun save(post: Post)
     fun saveAsync(post: Post, callback: Callback<Unit>)
+    fun saveRetrofit(post: Post, callback: Callback<Unit>)
     fun removeById(id: Long)
     fun removeByIdAsync(id: Long, callback: Callback<Unit>)
+    fun removeByIdRetrofit(id: Long, callback: Callback<Unit>)
     fun deleteLikeById(id: Long): Post
     fun deleteLikeByIdAsync(id: Long, callback: Callback<Post>)
+    fun deleteLikeByIdRetrofit(id: Long, callback: Callback<Post>)
 
 
     interface Callback<T> {

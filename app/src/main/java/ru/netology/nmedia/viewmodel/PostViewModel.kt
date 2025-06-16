@@ -6,7 +6,6 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.repository.*
 import ru.netology.nmedia.util.SingleLiveEvent
-import java.io.IOException
 import java.lang.Exception
 
 private val empty = Post(
@@ -58,9 +57,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun save() {
         edited.value?.let {
-            repository.saveAsync(it, object : PostRepository.Callback<Unit> {
+            _data.value = FeedModel(loading = true)
+            repository.saveRetrofit(it, object : PostRepository.Callback<Unit> {
                 override fun onSuccess(data: Unit) {
                     _postCreated.postValue(Unit)
+
                 }
 
                 override fun onError(exception: Exception) {
@@ -87,7 +88,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun likeById(id: Long) {
         // <--- Сохраняем результат if-else
         if ((_data.value?.posts.orEmpty().first { it.id == id }).likedByMe) {
-            repository.deleteLikeByIdAsync(id, object : PostRepository.Callback<Post> {
+            repository.deleteLikeByIdRetrofit(id, object : PostRepository.Callback<Post> {
+
                 override fun onSuccess(data: Post) {
                     _data.postValue( // <--- Обновляем LiveData
                         _data.value?.copy(
@@ -102,8 +104,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
             })
-        } else { // <--- Добавили else
-            repository.likeByIdAsync(id, object : PostRepository.Callback<Post> {
+        } else {
+
+            // <--- Добавили else
+            repository.likeByIdRetrofit(id, object : PostRepository.Callback<Post> {
                 override fun onSuccess(data: Post) {
                     _data.postValue( // <--- Обновляем LiveData
                         _data.value?.copy(
@@ -123,7 +127,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeById(id: Long) {
-        repository.removeByIdAsync(id, object : PostRepository.Callback<Unit> {
+        repository.removeByIdRetrofit(id, object : PostRepository.Callback<Unit> {
             val old = _data.value?.posts.orEmpty()
             override fun onSuccess(data: Unit) {
                 _data.postValue(
