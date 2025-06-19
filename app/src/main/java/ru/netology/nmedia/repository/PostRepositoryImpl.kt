@@ -237,6 +237,8 @@ class PostRepositoryImpl : PostRepository {
             ) {
                 if (!response.isSuccessful) {
                     callback.onError(RuntimeException(response.code().toString()))
+                } else {
+                    callback.onSuccess(Unit)
                 }
             }
 

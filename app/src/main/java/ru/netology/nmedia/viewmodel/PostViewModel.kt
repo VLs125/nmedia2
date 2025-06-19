@@ -100,7 +100,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onError(exception: Exception) {
-                    FeedModel(error = true)
+                    _data.postValue(FeedModel(error = true))
                 }
 
             })
@@ -118,7 +118,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onError(exception: Exception) {
-                    FeedModel(error = true)
+                    _data.postValue(FeedModel(error = true))
                 }
 
             })
@@ -130,6 +130,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         repository.removeByIdRetrofit(id, object : PostRepository.Callback<Unit> {
             val old = _data.value?.posts.orEmpty()
             override fun onSuccess(data: Unit) {
+
                 _data.postValue(
                     _data.value?.copy(
                         posts = _data.value?.posts.orEmpty()
