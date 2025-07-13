@@ -98,6 +98,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 repository.removeByIdRetrofit(id)
+                _data.postValue(
+                    _data.value?.copy(
+                        posts = _data.value?.posts.orEmpty()
+                            .filter { it.id != id }
+                    )
+                )
                 _dataState.value = FeedModelState()
 
             } catch (ex: Exception) {
