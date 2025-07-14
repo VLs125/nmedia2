@@ -80,13 +80,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 repository.likeByIdRetrofit(id)
-                _dataState.value = FeedModelState()
                 val currentFeed = _data.value?.posts
-
                 val updatedPosts = currentFeed!!.map { post ->
                     if (post.id == id) post.copy(likedByMe = !post.likedByMe) else post
                 }
                 _data.postValue(_data.value!!.copy(posts = updatedPosts))
+                _dataState.value = FeedModelState()
 
             } catch (ex: Exception) {
                 _dataState.value = FeedModelState(error = true)

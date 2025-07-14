@@ -22,6 +22,7 @@ class PostRepositoryImpl
 
     override suspend fun likeByIdRetrofit(id: Long) {
         dao.likeById(id)
+        PostsApi.service.likeById(id)
     }
 
     override suspend fun saveRetrofit(post: Post) {
@@ -29,6 +30,7 @@ class PostRepositoryImpl
     }
 
     override suspend fun removeByIdRetrofit(id: Long) {
+        PostsApi.service.removeById(id)
         dao.removeById(id)
     }
 
