@@ -29,7 +29,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         get() = _dataState
     private val _data = MutableLiveData(FeedModel())
     val data: LiveData<FeedModel> = repository.data.map { FeedModel(it, it.isEmpty()) }
-    suspend fun get() = _data
+     fun get() = _data
     val edited = MutableLiveData(empty)
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
@@ -59,7 +59,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 repository.saveRetrofit(it)
                 _postCreated.value = Unit
             }
-
         }
         edited.value = empty
     }

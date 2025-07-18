@@ -1,5 +1,6 @@
 package ru.netology.nmedia.api
 
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
@@ -13,19 +14,19 @@ import ru.netology.nmedia.dto.Post
 
 interface PostApiService {
     @GET("posts")
-   suspend fun getAll(): List<Post>
+    suspend fun getAll(): Response<List<Post>>
 
     @POST("posts/{id}/likes")
-    suspend fun likeById(@Path("id") id: Long): Post
+    suspend fun likeById(@Path("id") id: Long): Response<Post>
 
     @POST("posts")
-    suspend fun save(@Body post: Post): Unit
+    suspend fun save(@Body post: Post): Response<Post>
 
     @DELETE("posts/{id}")
-    suspend fun removeById(@Path("id") id: Long): Unit
+    suspend fun removeById(@Path("id") id: Long): Response<Unit>
 
     @DELETE("posts/{id}/likes")
-    suspend fun deleteLikeById(@Path("id") id: Long): Post
+    suspend fun deleteLikeById(@Path("id") id: Long): Response<Post>
 }
 
 object PostsApi {
