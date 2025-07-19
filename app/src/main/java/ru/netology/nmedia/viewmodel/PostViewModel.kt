@@ -78,14 +78,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun likeById(id: Long) {
         viewModelScope.launch {
             try {
-                repository.likeByIdRetrofit(id)
-                val currentFeed = _data.value?.posts
-                val updatedPosts = currentFeed!!.map { post ->
-                    if (post.id == id) post.copy(likedByMe = !post.likedByMe) else post
-                }
-                _data.postValue(_data.value!!.copy(posts = updatedPosts))
+                val likedByMe = data.value?.posts?.find { it.id == id }?.likedByMe ?: return@launch
+                if (likedByMe) repository.deleteLikeByIdRetrofit(id)
+                else repository.likeByIdRetrofit(id)
                 _dataState.value = FeedModelState()
-
             } catch (ex: Exception) {
                 _dataState.value = FeedModelState(error = true)
             }
@@ -96,14 +92,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 repository.removeByIdRetrofit(id)
-                _data.postValue(
-                    _data.value?.copy(
-                        posts = _data.value?.posts.orEmpty()
-                            .filter { it.id != id }
-                    )
-                )
                 _dataState.value = FeedModelState()
-
             } catch (ex: Exception) {
                 _dataState.value = FeedModelState(error = true)
             }

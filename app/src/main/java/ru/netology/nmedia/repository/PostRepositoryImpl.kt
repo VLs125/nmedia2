@@ -60,12 +60,12 @@ class PostRepositoryImpl
     }
 
     override suspend fun removeByIdRetrofit(id: Long) {
+        dao.removeById(id)
         try {
             val response = PostsApi.service.removeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-            dao.removeById(id)
         } catch (ex: Exception) {
             throw ex
         }
@@ -77,10 +77,11 @@ class PostRepositoryImpl
             val response = PostsApi.service.deleteLikeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
-                dao.likeById(id)
+
             }
 
         } catch (ex: Exception) {
+            dao.likeById(id)
             throw ex
         }
     }
