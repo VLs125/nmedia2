@@ -31,14 +31,16 @@ class PostRepositoryImpl
 
     override suspend fun likeByIdRetrofit(id: Long) {
 
+        dao.likeById(id)
         try {
             val response = PostsApi.service.likeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
+
             }
-            dao.likeById(id)
 
         } catch (ex: Exception) {
+            dao.likeById(id)
             throw ex
         }
     }
